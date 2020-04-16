@@ -12,12 +12,26 @@
 %       where n is the number of variables, and
 %             m is the number of terms in max
 %
+% Private methods:
+%
+%   [loss,active_index] = evaluateLoss(Q,F,J,d,gamma)
+%     Evaluates loss.
+%    
+%   [ga,gW] = evaluateLossDerivatives(Q,F,J,d,gamma)
+%     Evaluates loss derivatives.
+%    
+%   [d,gamma] = feedForward(Q,F)
+%     Feeds forward to produce output corresponding to input F.
+%    
+%   runLineSearch(Q,F,J,d,gamma,ga,gW)
+%     Runs line search.
+%
 % Public methods:
 %
-%   msg = Q.updateWeights(f)
-%     Updates weights in subproblem solver using function values in f.
+%   msg = Q.updateWeights(F,J)
+%     Updates weights in subproblem solver using function values in F.
 %
-%   d = Q.computeStep(f)
+%   d = Q.computeStep(F)
 %     Returns step based on current weights.
 %
 %   Q.printData
@@ -38,7 +52,7 @@ classdef QuasiCuttingPlane < handle
     %%%%%%%%%%%
     % Options %
     %%%%%%%%%%%
-    verbosity = 1 % verbosity level
+    verbosity = 0 % verbosity level
                   %   0 = prints nothing
                   %   1 = prints warnings and short messages
                   %   2 = also prints data after pair added
@@ -48,12 +62,30 @@ classdef QuasiCuttingPlane < handle
     %%%%%%%%%%%%%%%
     n = -1 % number of variables
     m = -1 % number of terms in max
+    
+    %%%%%%%%%%%%%%%%%
+    % Weight values %
+    %%%%%%%%%%%%%%%%%
+    a % weights for activities
+    W % weights for inverse
         
   end
   
   % Methods (private access)
   methods (Access = private)
-                
+
+    % Evaluate loss
+    [loss,active_index] = evaluateLoss(Q,F,J,d,gamma)
+    
+    % Evaluate loss derivatives
+    [ga,gW] = evaluateLossDerivatives(Q,F,J,d,gamma)
+    
+    % Feed forward to compute output
+    [d,gamma] = feedForward(Q,F)
+    
+    % Run line search
+    runLineSearch(Q,F,J,d,gamma,ga,gW)
+  
   end
   
   % Methods (public access)
@@ -74,10 +106,10 @@ classdef QuasiCuttingPlane < handle
     end
     
     % Update weights
-    msg = updateWeights(Q,f)
+    updateWeights(Q,F,J)
         
     % Compute step
-    d = computeStep(Q,f)
+    d = computeStep(Q,F)
     
     % Print data (for debugging)
     printData(Q)

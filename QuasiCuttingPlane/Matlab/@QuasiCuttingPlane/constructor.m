@@ -56,4 +56,8 @@ end
 % Set number of terms in max
 Q.m = m;
 
+% Initialize weights
+Q.a = 5e-01*ones(Q.m,1);
+Q.W = 1e-04*randn(Q.n+1,Q.m);
+
 end

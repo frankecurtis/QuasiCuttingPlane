@@ -15,4 +15,12 @@ fprintf('Variables = %d\n',Q.n);
 fprintf('Max terms = %d\n',Q.m);
 fprintf('Verbosity = %d\n',Q.verbosity);
 
+% Print vector data
+fprintf('Weights (activities) = \n');
+disp(Q.a);
+
+% Print matrix data
+fprintf('Weights (inverse) = \n');
+disp(Q.W);
+
 end

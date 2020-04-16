@@ -7,16 +7,16 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function d = computeStep(Q,f)
+function d = computeStep(Q,F)
 
 % Check size
-if length(size(f)) ~= 2   || ...
-   size(f,1)       ~= Q.m || ...
-   size(f,2)       ~= 1
-  error('QuasiCuttingPlane: Invalid input to computeStep(f).  Input f must be a column vector of length %d for this object.',Q.m);
+if length(size(F)) ~= 2   || ...
+   size(F,1)       ~= Q.m || ...
+   size(F,2)       ~= 1
+  error('QuasiCuttingPlane: Invalid input to computeStep(F).  Input F must be a column vector of length %d for this object.',Q.m);
 end
 
-% NEED TO FILL IN
-d = zeros(Q.n,1);
+% Feed forward
+[d,~] = Q.feedForward(F);
 
 end
