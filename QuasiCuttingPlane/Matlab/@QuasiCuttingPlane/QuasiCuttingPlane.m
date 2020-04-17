@@ -14,26 +14,23 @@
 %
 % Private methods:
 %
-%   [loss,active_index] = evaluateLoss(Q,F,J,d,gamma)
-%     Evaluates loss.
-%    
-%   [ga,gW] = evaluateLossDerivatives(Q,F,J,d,gamma)
-%     Evaluates loss derivatives.
-%    
 %   [d,gamma] = feedForward(Q,F)
 %     Feeds forward to produce output corresponding to input F.
 %    
-%   runLineSearch(Q,F,J,d,gamma,ga,gW)
+%   alpha = runLineSearch(Q,F,J,ga,gW)
 %     Runs line search.
 %
 % Public methods:
 %
-%   msg = Q.updateWeights(F,J)
-%     Updates weights in subproblem solver using function values in F.
-%
 %   d = Q.computeStep(F)
 %     Returns step based on current weights.
 %
+%   [loss,active_index] = evaluateLoss(Q,F,J)
+%     Evaluates loss.
+%    
+%   [ga,gW] = evaluateLossDerivatives(Q,F,J)
+%     Evaluates loss derivatives.
+%    
 %   Q.printData
 %     Prints all members of the class.
 %
@@ -42,6 +39,9 @@
 %     - verbosity=0 means that nothing is printed.
 %     - verbosity=1 means that warnings and short messages are printed.
 %     - verbosity=2 means that all data is printed after pair is added.
+%
+%   alpha = Q.updateWeights(F,J)
+%     Updates weights in subproblem solver using function values in F.
 
 % QuasiCuttingPlane class
 classdef QuasiCuttingPlane < handle
@@ -74,17 +74,11 @@ classdef QuasiCuttingPlane < handle
   % Methods (private access)
   methods (Access = private)
 
-    % Evaluate loss
-    [loss,active_index] = evaluateLoss(Q,F,J,d,gamma)
-    
-    % Evaluate loss derivatives
-    [ga,gW] = evaluateLossDerivatives(Q,F,J,d,gamma)
-    
     % Feed forward to compute output
     [d,gamma] = feedForward(Q,F)
     
     % Run line search
-    runLineSearch(Q,F,J,d,gamma,ga,gW)
+    alpha = runLineSearch(Q,F,J,ga,gW)
   
   end
   
@@ -105,9 +99,12 @@ classdef QuasiCuttingPlane < handle
       
     end
     
-    % Update weights
-    updateWeights(Q,F,J)
-        
+    % Evaluate loss
+    [loss,active_index] = evaluateLoss(Q,F,J)
+    
+    % Evaluate loss derivatives
+    [ga,gW] = evaluateLossDerivatives(Q,F,J)
+    
     % Compute step
     d = computeStep(Q,F)
     
@@ -117,6 +114,9 @@ classdef QuasiCuttingPlane < handle
     % Sets verbosity
     setVerbosity(Q,value)
     
+    % Update weights
+    alpha = updateWeights(Q,F,J)
+        
   end
   
   % Methods (static)
