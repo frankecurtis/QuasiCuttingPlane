@@ -18,6 +18,9 @@ p = size(F,2);
 % Loop over minibatch
 for s = 1:p
   
+  % Set activity indicators
+  a = Q.setActivityIndicators(F(:,s));
+  
   % Feed forward
   [d,gamma] = Q.feedForward(F(:,s));
   
@@ -25,14 +28,14 @@ for s = 1:p
   [l1,active_index] = max([F(:,s) + J*d; gamma]);
   
   % Update loss
-  loss = loss + (1/p)*l1;
+  loss = loss + (1/p)*l1^2;
   
   % Evaluate identity mapping penalty
   matrix = [-J ones(Q.m,1)]*Q.W - eye(Q.m);
   l2 = 0;
   for i = 1:Q.m
     for j = 1:Q.m
-      l2 = l2 + (Q.a(i)*Q.a(j)*matrix(i,j))^2;
+      l2 = l2 + a(i)*a(j)*matrix(i,j)^2;
     end
   end
   
@@ -42,25 +45,18 @@ for s = 1:p
   % Evaluate inactive penalty term
   l3 = 0;
   for i = 1:Q.m
-    l3 = l3 + (1 - Q.a(i))*Q.W(:,i)'*Q.W(:,i);
+    l3 = l3 + (1 - a(i))*Q.W(:,i)'*Q.W(:,i);
   end
   
   % Update loss
   loss = loss + (1/p)*l3;
-  
-  % Evaluate number of active penalty term
-  l4 = (Q.n + 1 - sum(Q.a))^2;
-  
-  % Update loss
-  loss = loss + (1/p)*l4;
-  
+    
   % Print losses
   if Q.verbosity >= 1
     fprintf('QuasiCuttingPlane: Loss, active index  = %+e\n',active_index);
     fprintf('QuasiCuttingPlane: Loss, max linear    = %+e\n',l1);
     fprintf('QuasiCuttingPlane: Loss, identity map  = %+e\n',l2);
     fprintf('QuasiCuttingPlane: Loss, inactive      = %+e\n',l3);
-    fprintf('QuasiCuttingPlane: Loss, number active = %+e\n',l4);
   end
   
 end

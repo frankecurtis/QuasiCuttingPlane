@@ -10,7 +10,7 @@
 function [d,gamma] = feedForward(Q,F)
 
 % Feed forward
-dgamma = Q.W*(Q.a.*F);
+dgamma = Q.W*F;
 
 % Split output
 d     = dgamma(1:end-1);

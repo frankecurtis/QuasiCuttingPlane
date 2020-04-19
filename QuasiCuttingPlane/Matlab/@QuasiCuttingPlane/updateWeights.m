@@ -24,10 +24,10 @@ if length(size(J)) ~= 2   || ...
 end
 
 % Evaluate loss derivatives
-[ga,gW] = Q.evaluateLossDerivatives(F,J);
+gW = Q.evaluateLossDerivatives(F,J);
 
 % Run line search
-alpha = Q.runLineSearch(F,J,ga,gW);
+alpha = Q.runLineSearch(F,J,gW);
 
 % Check verbosity
 if Q.verbosity >= 2, Q.printData; end

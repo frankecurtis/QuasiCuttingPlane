@@ -9,9 +9,6 @@
 % Constructor
 function constructor(Q,n,m)
 
-% Initialize message
-msg = '';
-
 % First input must be number of variables, a positive integer
 if ~isnumeric(n)
   msg = 'QuasiCuttingPlane: 1st input to constructor must be positive integer';
@@ -57,7 +54,6 @@ end
 Q.m = m;
 
 % Initialize weights
-Q.a = 5e-01*ones(Q.m,1);
-Q.W = 1e-04*randn(Q.n+1,Q.m);
+Q.W = zeros(Q.n+1,Q.m);
 
 end

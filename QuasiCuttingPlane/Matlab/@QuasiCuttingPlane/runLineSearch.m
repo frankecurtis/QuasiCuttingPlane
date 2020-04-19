@@ -7,10 +7,9 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function alpha = runLineSearch(Q,F,J,ga,gW)
+function alpha = runLineSearch(Q,F,J,gW)
 
 % Store current values and loss
-a = Q.a;
 W = Q.W;
 [loss,~] = Q.evaluateLoss(F,J);
 
@@ -18,7 +17,6 @@ W = Q.W;
 alpha = 1;
 
 % Set trial values
-Q.a = Q.a - alpha*ga; Q.a = max(0,min(Q.a,1));
 Q.W = Q.W - alpha*gW;
 
 % Evaluate new loss
@@ -28,20 +26,18 @@ Q.W = Q.W - alpha*gW;
 while 1
   
   % Check for decrease
-  if loss_new < loss - 1e-8*alpha*(norm(ga)^2 + norm(gW,'fro')^2), break; end
+  if loss_new < loss - 1e-1*alpha*norm(gW,'fro')^2, break; end
   
   % Check for small stepsize
-  if alpha < 1e-20, Q.a = a; Q.W = W; break; end
+  if alpha < 1e-20, Q.W = W; break; end
   
   % Reset values
-  Q.a = a;
   Q.W = W;
   
   % Reduce stepsize
   alpha = alpha/2;
 
   % Set trial values
-  Q.a = Q.a - alpha*ga; Q.a = max(0,min(Q.a,1));
   Q.W = Q.W - alpha*gW;
 
   % Evaluate new loss

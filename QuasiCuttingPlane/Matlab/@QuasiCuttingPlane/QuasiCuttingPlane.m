@@ -14,21 +14,27 @@
 %
 % Private methods:
 %
-%   [d,gamma] = feedForward(Q,F)
+%   [d,gamma] = Q.feedForward(F)
 %     Feeds forward to produce output corresponding to input F.
 %    
-%   alpha = runLineSearch(Q,F,J,ga,gW)
+%   a = Q.setActivityIndicators(F)
+%     Set activity indicators
+%
+%   alpha = Q.runLineSearch(F,J,gW)
 %     Runs line search.
 %
 % Public methods:
 %
+%   Q.checkDerivatives(F,J)
+%     Checks derivatives with respect to weights.
+%
 %   d = Q.computeStep(F)
 %     Returns step based on current weights.
 %
-%   [loss,active_index] = evaluateLoss(Q,F,J)
+%   [loss,active_index] = Q.evaluateLoss(F,J)
 %     Evaluates loss.
 %    
-%   [ga,gW] = evaluateLossDerivatives(Q,F,J)
+%   gW = Q.evaluateLossDerivatives(F,J)
 %     Evaluates loss derivatives.
 %    
 %   Q.printData
@@ -42,6 +48,14 @@
 %
 %   alpha = Q.updateWeights(F,J)
 %     Updates weights in subproblem solver using function values in F.
+%
+%   W = Q.weights
+%     Returns weights.
+%
+% Static methods:
+%
+%   Q.usageMessage
+%     Returns usage message for user.
 
 % QuasiCuttingPlane class
 classdef QuasiCuttingPlane < handle
@@ -66,7 +80,6 @@ classdef QuasiCuttingPlane < handle
     %%%%%%%%%%%%%%%%%
     % Weight values %
     %%%%%%%%%%%%%%%%%
-    a % weights for activities
     W % weights for inverse
         
   end
@@ -77,8 +90,11 @@ classdef QuasiCuttingPlane < handle
     % Feed forward to compute output
     [d,gamma] = feedForward(Q,F)
     
+    % Set activity indicators
+    a = setActivityIndicators(Q,F);
+    
     % Run line search
-    alpha = runLineSearch(Q,F,J,ga,gW)
+    alpha = runLineSearch(Q,F,J,gW)
   
   end
   
@@ -99,14 +115,17 @@ classdef QuasiCuttingPlane < handle
       
     end
     
+    % Check derivatives
+    checkDerivatives(Q,F,J)
+    
+    % Compute step
+    d = computeStep(Q,F)
+    
     % Evaluate loss
     [loss,active_index] = evaluateLoss(Q,F,J)
     
     % Evaluate loss derivatives
-    [ga,gW] = evaluateLossDerivatives(Q,F,J)
-    
-    % Compute step
-    d = computeStep(Q,F)
+    gW = evaluateLossDerivatives(Q,F,J)
     
     % Print data (for debugging)
     printData(Q)
@@ -116,7 +135,12 @@ classdef QuasiCuttingPlane < handle
     
     % Update weights
     alpha = updateWeights(Q,F,J)
-        
+    
+    % Get weights, activities
+    function W = weights(Q)
+      W = Q.W;
+    end
+
   end
   
   % Methods (static)
