@@ -7,15 +7,12 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function a = setActivityIndicators(Q,F)
+function a = activityEstimate(Q,F)
 
 % Find largest elements
 [~,I] = sort(F,'descend');
 
-% Initialize activity indicators
-a = zeros(Q.m,1);
-
-% Set activity indicators
-a(I(1:Q.n+1)) = 1;
+% Set estimate
+a = I(1:Q.n+1);
 
 end

@@ -7,7 +7,7 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function gW = evaluateLossDerivatives(Q,F,J)
+function gW = evaluateLossDerivatives(Q,F,J,a)
 
 % Initialize derivatives
 gW = zeros(size(Q.W));
@@ -18,38 +18,15 @@ p = size(F,2);
 % Loop over minibatch
 for s = 1:p
   
-  % Set activity indicators
-  a = Q.setActivityIndicators(F(:,s));
-  
   % Feed forward
-  [d,gamma] = Q.feedForward(F(:,s));
+  [d,gamma] = Q.feedForward(F(:,s),a);
   
-  % Evaluate max linear term
-  [l,active_index] = max([F(:,s) + J*d; gamma]);
-  
-  % Set matrix from loss function
-  matrix = [-J ones(Q.m,1)]*Q.W - eye(Q.m);
-  
-  % Update derivatives
-  for i = 1:Q.m
-    for j = 1:Q.m
-      gW(1:Q.n,i) = gW(1:Q.n,i) - (1/p)*(2*a(i)*a(j)* matrix(j,i)*J(j,:)');
-      gW(end,i)   = gW(end,i)   + (1/p)*(2*a(i)*a(j)* matrix(j,i));
-    end
-  end
-  
-  % Check activity
-  if active_index > Q.m
-    for i = 1:Q.m
-      gW(1:Q.n,i) = gW(1:Q.n,i) + (1/p)*(2*(1-a(i))*Q.W(1:Q.n,i));
-      gW(end,i)   = gW(end,i)   + (1/p)*(2*l*F(i,s) + 2*(1-a(i))*Q.W(end,i));
-    end
-  else
-    for i = 1:Q.m
-      gW(1:Q.n,i) = gW(1:Q.n,i) + (1/p)*(2*l*J(active_index,:)'*F(i,s) + 2*(1-a(i))*Q.W(1:Q.n,i));
-      gW(end,i)   = gW(end,i)   + (1/p)*(2*(1-a(i))*Q.W(end,i));
-    end
-  end
+  % Evaluate loss derivatives
+  gW(:,a) = gW(:,a) + (2/p)*([zeros(Q.n,Q.n+1);
+                              F(a,s)'/2] + ...
+                             [J(a,:)'*(F(a,s) + J(a,:)*d - gamma*ones(Q.n+1,1))*F(a,s)';
+                              F(a,s)'*(gamma*(Q.n+1) - sum(F(a,s) + J(a,:)*d))] + ...
+                             [-J(a,:) ones(Q.n+1,1)]'*([-J(a,:) ones(Q.n+1,1)]*Q.W(:,a) - eye(Q.n+1)));
   
 end
 

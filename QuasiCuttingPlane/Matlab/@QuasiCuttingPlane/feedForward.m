@@ -7,10 +7,10 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function [d,gamma] = feedForward(Q,F)
+function [d,gamma] = feedForward(Q,F,a)
 
 % Feed forward
-dgamma = Q.W*F;
+dgamma = Q.W(:,a)*F(a);
 
 % Split output
 d     = dgamma(1:end-1);

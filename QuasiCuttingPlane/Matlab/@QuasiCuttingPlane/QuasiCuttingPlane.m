@@ -14,24 +14,27 @@
 %
 % Private methods:
 %
-%   [d,gamma] = Q.feedForward(F)
+%   [d,gamma] = Q.feedForward(F,a)
 %     Feeds forward to produce output corresponding to input F.
 %    
-%   a = Q.setActivityIndicators(F)
-%     Set activity indicators
-%
 %   alpha = Q.runLineSearch(F,J,gW)
 %     Runs line search.
 %
 % Public methods:
 %
+%   a = Q.activityEstimate(F)
+%     Sets activity estimate.
+%
 %   Q.checkDerivatives(F,J)
 %     Checks derivatives with respect to weights.
 %
-%   d = Q.computeStep(F)
+%   d = Q.computeStep(F,a)
 %     Returns step based on current weights.
 %
-%   [loss,active_index] = Q.evaluateLoss(F,J)
+%   gamma = Q.computeValue(F,a)
+%     Returns optimal value estimate based on current weights.
+%
+%   loss = Q.evaluateLoss(F,J)
 %     Evaluates loss.
 %    
 %   gW = Q.evaluateLossDerivatives(F,J)
@@ -54,7 +57,7 @@
 %
 % Static methods:
 %
-%   Q.usageMessage
+%   msg = Q.usageMessage
 %     Returns usage message for user.
 
 % QuasiCuttingPlane class
@@ -81,6 +84,12 @@ classdef QuasiCuttingPlane < handle
     % Weight values %
     %%%%%%%%%%%%%%%%%
     W % weights for inverse
+    
+    %%%%%%%%%%%%%
+    % Constants %
+    %%%%%%%%%%%%%
+    LS_CON = 1e-08;
+    LS_MIN = 1e-20;
         
   end
   
@@ -88,13 +97,10 @@ classdef QuasiCuttingPlane < handle
   methods (Access = private)
 
     % Feed forward to compute output
-    [d,gamma] = feedForward(Q,F)
-    
-    % Set activity indicators
-    a = setActivityIndicators(Q,F);
+    [d,gamma] = feedForward(Q,F,a)
     
     % Run line search
-    alpha = runLineSearch(Q,F,J,gW)
+    alpha = runLineSearch(Q,F,J,a,gW)
   
   end
   
@@ -115,17 +121,23 @@ classdef QuasiCuttingPlane < handle
       
     end
     
+    % Set activity estimate
+    a = activityEstimate(Q,F)
+    
     % Check derivatives
-    checkDerivatives(Q,F,J)
+    checkDerivatives(Q,F,J,a)
     
     % Compute step
-    d = computeStep(Q,F)
+    d = computeStep(Q,F,a)
+    
+    % Compute optimal value estimate
+    gamma = computeValue(Q,F,a)
     
     % Evaluate loss
-    [loss,active_index] = evaluateLoss(Q,F,J)
+    loss = evaluateLoss(Q,F,J,a)
     
     % Evaluate loss derivatives
-    gW = evaluateLossDerivatives(Q,F,J)
+    gW = evaluateLossDerivatives(Q,F,J,a)
     
     % Print data (for debugging)
     printData(Q)
@@ -134,7 +146,7 @@ classdef QuasiCuttingPlane < handle
     setVerbosity(Q,value)
     
     % Update weights
-    alpha = updateWeights(Q,F,J)
+    alpha = updateWeights(Q,F,J,a)
     
     % Get weights, activities
     function W = weights(Q)

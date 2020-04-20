@@ -7,7 +7,7 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function alpha = updateWeights(Q,F,J)
+function alpha = updateWeights(Q,F,J,a)
 
 % Check size of F
 if length(size(F)) ~= 2   || ...
@@ -24,10 +24,10 @@ if length(size(J)) ~= 2   || ...
 end
 
 % Evaluate loss derivatives
-gW = Q.evaluateLossDerivatives(F,J);
+gW = Q.evaluateLossDerivatives(F,J,a);
 
 % Run line search
-alpha = Q.runLineSearch(F,J,gW);
+alpha = Q.runLineSearch(F,J,a,gW);
 
 % Check verbosity
 if Q.verbosity >= 2, Q.printData; end
