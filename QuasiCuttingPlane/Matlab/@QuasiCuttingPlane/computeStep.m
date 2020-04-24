@@ -7,16 +7,13 @@
 % Method definition for QuasiCuttingPlane class
 
 % Add pair
-function d = computeStep(Q,F,a)
-
-% Check size
-if length(size(F)) ~= 2   || ...
-   size(F,1)       ~= Q.m || ...
-   size(F,2)       ~= 1
-  error('QuasiCuttingPlane: Invalid input to computeStep(F).  Input F must be a column vector of length %d for this object.',Q.m);
-end
+function [d,gamma] = computeStep(Q,F,a)
 
 % Feed forward
-[d,~] = Q.feedForward(F,a);
+dgamma = Q.W(:,a)*F(a);
+
+% Split output
+d     = dgamma(1:end-1);
+gamma = dgamma(end);
 
 end

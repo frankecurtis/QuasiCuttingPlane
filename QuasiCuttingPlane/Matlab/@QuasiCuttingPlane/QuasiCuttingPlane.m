@@ -14,30 +14,21 @@
 %
 % Private methods:
 %
-%   [d,gamma] = Q.feedForward(F,a)
-%     Feeds forward to produce output corresponding to input F.
-%    
-%   alpha = Q.runLineSearch(F,J,gW)
+%   alpha = Q.runLineSearch(F,J,a,gW)
 %     Runs line search.
 %
 % Public methods:
 %
-%   a = Q.activityEstimate(F)
-%     Sets activity estimate.
-%
-%   Q.checkDerivatives(F,J)
+%   Q.checkDerivatives(F,J,a)
 %     Checks derivatives with respect to weights.
 %
-%   d = Q.computeStep(F,a)
+%   [d,gamma] = Q.computeStep(F,a)
 %     Returns step based on current weights.
 %
-%   gamma = Q.computeValue(F,a)
-%     Returns optimal value estimate based on current weights.
-%
-%   loss = Q.evaluateLoss(F,J)
+%   loss = Q.evaluateLoss(F,J,a)
 %     Evaluates loss.
 %    
-%   gW = Q.evaluateLossDerivatives(F,J)
+%   gW = Q.evaluateLossDerivatives(F,J,a)
 %     Evaluates loss derivatives.
 %    
 %   Q.printData
@@ -49,7 +40,7 @@
 %     - verbosity=1 means that warnings and short messages are printed.
 %     - verbosity=2 means that all data is printed after pair is added.
 %
-%   alpha = Q.updateWeights(F,J)
+%   alpha = Q.updateWeights(F,J,a)
 %     Updates weights in subproblem solver using function values in F.
 %
 %   W = Q.weights
@@ -96,9 +87,6 @@ classdef QuasiCuttingPlane < handle
   % Methods (private access)
   methods (Access = private)
 
-    % Feed forward to compute output
-    [d,gamma] = feedForward(Q,F,a)
-    
     % Run line search
     alpha = runLineSearch(Q,F,J,a,gW)
   
@@ -121,17 +109,11 @@ classdef QuasiCuttingPlane < handle
       
     end
     
-    % Set activity estimate
-    a = activityEstimate(Q,F)
-    
     % Check derivatives
     checkDerivatives(Q,F,J,a)
     
     % Compute step
-    d = computeStep(Q,F,a)
-    
-    % Compute optimal value estimate
-    gamma = computeValue(Q,F,a)
+    [d,gamma] = computeStep(Q,F,a)
     
     % Evaluate loss
     loss = evaluateLoss(Q,F,J,a)
